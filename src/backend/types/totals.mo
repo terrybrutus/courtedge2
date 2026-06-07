@@ -1,4 +1,3 @@
-import Debug "mo:core/Debug";
 import CommonTypes "common";
 
 module {
@@ -16,6 +15,7 @@ module {
     avgFoulsPerGame : ?Float;
     avgFreeThrowsPerGame : ?Float;
     overRate : ?Float;
+    tendency : Text;
   };
 
   public type PaceProfile = {
