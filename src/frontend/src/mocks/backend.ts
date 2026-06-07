@@ -263,8 +263,6 @@ export const mockBackend: backendInterface = {
     winRate: 0,
   }),
 
-  getHistoryContext: async () => "",
-
   saveBetRecommendation: async (_rec) => ({ __kind__: "ok", ok: _rec.id }),
 
   updateBetOutcome: async (_id, _status, _gameResult) => ({ __kind__: "ok", ok: true }),
