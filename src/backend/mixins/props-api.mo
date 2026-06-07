@@ -135,7 +135,7 @@ mixin (bdlApiKey : Text, openAIApiKey : Text, httpTransform : shared query OutCa
 
   // On-demand AI analysis — reads history context for self-learning
   public func getPropsAIAnalysis(gameId : Text, playerData : Text) : async Text {
-    let historyCtx = getHistoryContext();
+    let historyCtx = "";
     let aiSystemPrompt = "You are CourtEdge AI, a professional NBA betting analyst. Be selective — only flag confidence ≥65 where multiple signals align. Less is more.";
     let cleanData = playerData.replace(#text "\"", "'");
     let cleanHistory = historyCtx.replace(#text "\"", "'");
