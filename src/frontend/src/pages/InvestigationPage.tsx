@@ -1145,6 +1145,235 @@ function AllOddsTab({
   );
 }
 
+// ─── Edge Tab ─────────────────────────────────────────────────────────────────
+function EdgeTab({ investigation }: { investigation: GameInvestigation }) {
+  const { lineMovement, restAdvantage, situationalAngles, refereeProfile } =
+    investigation;
+
+  return (
+    <div className="space-y-5" data-ocid="investigation.edge_tab">
+      {/* Line Movement */}
+      {lineMovement ? (
+        <div className="rounded-xl border border-border/60 bg-card overflow-hidden">
+          <div className="px-5 py-3 border-b border-border/40 flex items-center justify-between">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+              <TrendingUp className="w-3 h-3" />
+              Line Movement
+            </span>
+            {lineMovement.steamAlert && (
+              <span className="flex items-center gap-1 px-2 py-0.5 rounded border border-destructive/50 text-destructive bg-destructive/10 text-[9px] font-mono uppercase tracking-widest">
+                <Flame className="w-2.5 h-2.5" />
+                Steam Alert
+              </span>
+            )}
+          </div>
+          <div className="p-4 grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">
+                Spread
+              </p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-[11px] font-mono text-muted-foreground/60">
+                  Open: {lineMovement.openingSpread !== undefined && lineMovement.openingSpread !== null ? (lineMovement.openingSpread > 0 ? `+${lineMovement.openingSpread}` : String(lineMovement.openingSpread)) : "—"}
+                </span>
+                <span className="text-[10px] font-mono text-muted-foreground">→</span>
+                <span className="text-sm font-mono font-semibold text-foreground">
+                  {lineMovement.currentSpread !== undefined && lineMovement.currentSpread !== null ? (lineMovement.currentSpread > 0 ? `+${lineMovement.currentSpread}` : String(lineMovement.currentSpread)) : "—"}
+                </span>
+              </div>
+              {lineMovement.spreadMove !== 0 && (
+                <p className={cn("text-[10px] font-mono", lineMovement.spreadMove < 0 ? "text-primary" : "text-destructive")}>
+                  {lineMovement.spreadMove > 0 ? "+" : ""}{lineMovement.spreadMove.toFixed(1)} pts moved
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">
+                Total (O/U)
+              </p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-[11px] font-mono text-muted-foreground/60">
+                  Open: {lineMovement.openingTotal !== undefined && lineMovement.openingTotal !== null ? lineMovement.openingTotal : "—"}
+                </span>
+                <span className="text-[10px] font-mono text-muted-foreground">→</span>
+                <span className="text-sm font-mono font-semibold text-foreground">
+                  {lineMovement.currentTotal !== undefined && lineMovement.currentTotal !== null ? lineMovement.currentTotal : "—"}
+                </span>
+              </div>
+              {lineMovement.totalMove !== 0 && (
+                <p className={cn("text-[10px] font-mono", lineMovement.totalMove > 0 ? "text-primary" : "text-destructive")}>
+                  {lineMovement.totalMove > 0 ? "+" : ""}{lineMovement.totalMove.toFixed(1)} pts moved
+                </p>
+              )}
+            </div>
+          </div>
+          {lineMovement.sharpSide !== "NONE" && (
+            <div className="px-4 pb-4">
+              <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground mb-1">
+                Sharp Action
+              </p>
+              <p className="text-xs font-mono text-accent font-semibold">
+                {lineMovement.sharpSide} side getting sharp money
+              </p>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="rounded-xl border border-border/40 bg-card/40 p-5 text-center">
+          <TrendingUp className="w-5 h-5 text-muted-foreground/40 mx-auto mb-2" />
+          <p className="text-xs font-mono text-muted-foreground">
+            Line movement data available after first odds fetch
+          </p>
+        </div>
+      )}
+
+      {/* Rest Advantage */}
+      {restAdvantage ? (
+        <div className="rounded-xl border border-border/60 bg-card overflow-hidden">
+          <div className="px-5 py-3 border-b border-border/40">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+              <Clock className="w-3 h-3" />
+              Rest Advantage
+            </span>
+          </div>
+          <div className="p-4 space-y-3">
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div>
+                <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground mb-1">
+                  Away Rest
+                </p>
+                <p className="text-2xl font-display font-bold text-foreground">
+                  {String(restAdvantage.awayRestDays)}
+                </p>
+                <p className="text-[9px] font-mono text-muted-foreground">days</p>
+              </div>
+              <div className="flex flex-col items-center justify-center">
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "text-[9px] font-mono uppercase tracking-widest",
+                    restAdvantage.advantage === "HOME"
+                      ? "border-primary/40 text-primary bg-primary/5"
+                      : restAdvantage.advantage === "AWAY"
+                        ? "border-accent/40 text-accent bg-accent/5"
+                        : "border-border/40 text-muted-foreground",
+                  )}
+                >
+                  {restAdvantage.advantage === "NONE" ? "Even" : `${restAdvantage.advantage} Edge`}
+                </Badge>
+              </div>
+              <div>
+                <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground mb-1">
+                  Home Rest
+                </p>
+                <p className="text-2xl font-display font-bold text-foreground">
+                  {String(restAdvantage.homeRestDays)}
+                </p>
+                <p className="text-[9px] font-mono text-muted-foreground">days</p>
+              </div>
+            </div>
+            <p className="text-xs font-body text-muted-foreground leading-relaxed">
+              {restAdvantage.impactDescription}
+            </p>
+          </div>
+        </div>
+      ) : null}
+
+      {/* Situational Angles */}
+      {situationalAngles.length > 0 && (
+        <div className="rounded-xl border border-border/60 bg-card overflow-hidden">
+          <div className="px-5 py-3 border-b border-border/40">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+              <Zap className="w-3 h-3" />
+              Situational Angles · {situationalAngles.length}
+            </span>
+          </div>
+          <div className="divide-y divide-border/25">
+            {situationalAngles.map((angle, i) => (
+              <div key={i} className="p-4 space-y-2">
+                <div className="flex items-start justify-between gap-3">
+                  <p className="text-xs font-mono font-semibold text-foreground">
+                    {angle.name}
+                  </p>
+                  <span className="shrink-0 text-[9px] font-mono px-2 py-0.5 rounded border border-accent/40 text-accent bg-accent/5">
+                    {String(angle.confidence)}% conf
+                  </span>
+                </div>
+                <p className="text-[11px] font-body text-muted-foreground leading-relaxed">
+                  {angle.description}
+                </p>
+                <p className="text-[10px] font-mono font-semibold text-primary">
+                  {angle.edge}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Referee Profile */}
+      {refereeProfile ? (
+        <div className="rounded-xl border border-border/60 bg-card overflow-hidden">
+          <div className="px-5 py-3 border-b border-border/40">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              Referee Profile
+            </span>
+          </div>
+          <div className="p-4 space-y-3">
+            <p className="font-display text-base font-bold text-foreground">
+              {refereeProfile.name}
+            </p>
+            <div className="grid grid-cols-3 gap-3 text-center">
+              {refereeProfile.avgFoulsPerGame !== undefined && refereeProfile.avgFoulsPerGame !== null && (
+                <div className="rounded-lg border border-border/40 bg-muted/20 p-2 space-y-0.5">
+                  <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">
+                    Fouls/Game
+                  </p>
+                  <p className="text-lg font-display font-bold text-foreground">
+                    {refereeProfile.avgFoulsPerGame.toFixed(1)}
+                  </p>
+                </div>
+              )}
+              {refereeProfile.avgFreeThrowsPerGame !== undefined && refereeProfile.avgFreeThrowsPerGame !== null && (
+                <div className="rounded-lg border border-border/40 bg-muted/20 p-2 space-y-0.5">
+                  <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">
+                    FT/Game
+                  </p>
+                  <p className="text-lg font-display font-bold text-foreground">
+                    {refereeProfile.avgFreeThrowsPerGame.toFixed(1)}
+                  </p>
+                </div>
+              )}
+              {refereeProfile.overRate !== undefined && refereeProfile.overRate !== null && (
+                <div className="rounded-lg border border-border/40 bg-muted/20 p-2 space-y-0.5">
+                  <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">
+                    Over Rate
+                  </p>
+                  <p className={cn("text-lg font-display font-bold", refereeProfile.overRate >= 0.52 ? "text-primary" : "text-muted-foreground")}>
+                    {(refereeProfile.overRate * 100).toFixed(0)}%
+                  </p>
+                </div>
+              )}
+            </div>
+            <p className="text-xs font-body text-muted-foreground leading-relaxed">
+              {refereeProfile.tendency}
+            </p>
+          </div>
+        </div>
+      ) : null}
+
+      {!lineMovement && !restAdvantage && situationalAngles.length === 0 && !refereeProfile && (
+        <div className="rounded-xl border border-border/40 bg-card/40 p-8 text-center space-y-2">
+          <Zap className="w-6 h-6 text-muted-foreground/30 mx-auto" />
+          <p className="text-sm font-body text-muted-foreground">
+            Edge data loads when the game investigation runs with live odds.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Game status badge ────────────────────────────────────────────────────────
 function StatusBadge({ status }: { status: string }) {
   const isLive =
@@ -1244,7 +1473,7 @@ function InvestigationSkeleton() {
 }
 
 // ─── Main page ────────────────────────────────────────────────────────────────
-type TabId = "props" | "total" | "odds";
+type TabId = "props" | "total" | "odds" | "edge";
 
 export default function InvestigationPage() {
   const { gameId } = useParams({ from: "/game/$gameId" });
@@ -1443,6 +1672,16 @@ export default function InvestigationPage() {
             All Odds
           </span>
         </TabButton>
+        <TabButton
+          active={activeTab === "edge"}
+          onClick={() => setActiveTab("edge")}
+          ocid="investigation.tab.edge"
+        >
+          <span className="flex items-center gap-1.5">
+            <Zap className="w-3 h-3" />
+            Edge
+          </span>
+        </TabButton>
       </div>
 
       {/* Tab panels */}
@@ -1463,6 +1702,7 @@ export default function InvestigationPage() {
           />
         )}
         {activeTab === "odds" && <AllOddsTab investigation={investigation} />}
+        {activeTab === "edge" && <EdgeTab investigation={investigation} />}
       </div>
     </div>
   );

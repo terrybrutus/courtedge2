@@ -1075,4 +1075,60 @@ module {
     result;
   };
 
+  // Find the last occurrence of needle in haystack; returns the starting index or null.
+  public func textLastIndexOf(haystack : Text, needle : Text) : ?Nat {
+    if (needle.size() == 0 or needle.size() > haystack.size()) return null;
+    let hArray = haystack.toArray();
+    let nArray = needle.toArray();
+    let hLen = hArray.size();
+    let nLen = nArray.size();
+    var lastFound : ?Nat = null;
+    var i = 0;
+    while (i + nLen <= hLen) {
+      var match = true;
+      var j = 0;
+      while (j < nLen) {
+        if (hArray[i + j] != nArray[j]) { match := false };
+        j += 1;
+      };
+      if (match) { lastFound := ?i };
+      i += 1;
+    };
+    lastFound;
+  };
+
+  // Parse "YYYY-MM-DD" into (year, month, day) as Nat tuple.
+  // Returns (0, 0, 0) on parse failure.
+  public func parseDateComponents(s : Text) : (Nat, Nat, Nat) {
+    if (s.size() < 10) return (0, 0, 0);
+    let chars = s.toArray();
+    let y1 = (chars[0].toNat32() : Nat) - 48;
+    let y2 = (chars[1].toNat32() : Nat) - 48;
+    let y3 = (chars[2].toNat32() : Nat) - 48;
+    let y4 = (chars[3].toNat32() : Nat) - 48;
+    let m1 = (chars[5].toNat32() : Nat) - 48;
+    let m2 = (chars[6].toNat32() : Nat) - 48;
+    let d1 = (chars[8].toNat32() : Nat) - 48;
+    let d2 = (chars[9].toNat32() : Nat) - 48;
+    (y1 * 1000 + y2 * 100 + y3 * 10 + y4, m1 * 10 + m2, d1 * 10 + d2);
+  };
+
+  // Convert (year, month, day) to a Julian Day Number (for date arithmetic).
+  func toJulianDay(year : Nat, month : Nat, day : Nat) : Nat {
+    let a = (14 - month) / 12;
+    let y = year + 4800 - a;
+    let m = month + 12 * a - 3;
+    day + (153 * m + 2) / 5 + 365 * y + y / 4 - y / 100 + y / 400 - 32045;
+  };
+
+  // Compute absolute day difference between two "YYYY-MM-DD" strings.
+  public func dateDiffDays(a : Text, b : Text) : Nat {
+    let (ay, am, ad) = parseDateComponents(a);
+    let (by, bm, bd) = parseDateComponents(b);
+    if (ay == 0 or by == 0) return 0;
+    let jdA = toJulianDay(ay, am, ad);
+    let jdB = toJulianDay(by, bm, bd);
+    if (jdA > jdB) jdA - jdB else jdB - jdA;
+  };
+
 }
