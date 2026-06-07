@@ -1,5 +1,4 @@
 import CommonTypes "common";
-import TotalTypes "totals";
 
 module {
   public type GameStatus = {
@@ -69,34 +68,6 @@ module {
     recommendation : Text;
   };
 
-  // Line movement from opening to current — stored per game in actor state
-  public type LineMovement = {
-    openingSpread : ?Float;
-    currentSpread : ?Float;
-    spreadMove : Float;      // positive = moved toward home (home gave fewer points)
-    openingTotal : ?Float;
-    currentTotal : ?Float;
-    totalMove : Float;       // positive = total moved up
-    steamAlert : Bool;       // true if 1.5+ spread move or 3+ total move
-    sharpSide : Text;        // "HOME", "AWAY", or "NONE"
-  };
-
-  // Rest advantage between the two teams
-  public type RestAdvantage = {
-    homeRestDays : Nat;
-    awayRestDays : Nat;
-    advantage : Text;           // "HOME", "AWAY", or "NONE"
-    impactDescription : Text;
-  };
-
-  // Rule-based situational betting angle
-  public type SituationalAngle = {
-    name : Text;
-    description : Text;
-    edge : Text;
-    confidence : Nat;
-  };
-
   public type GameInvestigation = {
     game : Game;
     homeTeamStats : TeamStats;
@@ -104,10 +75,6 @@ module {
     injuries : [InjuryReport];
     odds : [OddsLine];
     discrepancies : [Discrepancy];
-    lineMovement : ?LineMovement;
-    restAdvantage : ?RestAdvantage;
-    situationalAngles : [SituationalAngle];
-    refereeProfile : ?TotalTypes.RefereeProfile;
   };
 
   public type TeamStats = {
@@ -124,7 +91,7 @@ module {
   // Wraps the games list with metadata about which date they are from.
   public type GamesResponse = {
     games : [Game];
-    gamesDate : Text;
-    isUpcomingDate : Bool;
+    gamesDate : Text;      // YYYY-MM-DD of the games being shown
+    isUpcomingDate : Bool; // true when date != today (upcoming search result)
   };
 }

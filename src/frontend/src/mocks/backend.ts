@@ -116,43 +116,6 @@ export const mockBackend: backendInterface = {
         defensiveRating: 112.7,
         pointsPerGame: 108.9,
       },
-      lineMovement: {
-        openingSpread: -5.0,
-        currentSpread: -6.5,
-        spreadMove: -1.5,
-        openingTotal: 226.5,
-        currentTotal: 224.5,
-        totalMove: -2.0,
-        steamAlert: true,
-        sharpSide: "HOME",
-      },
-      restAdvantage: {
-        homeRestDays: BigInt(2),
-        awayRestDays: BigInt(1),
-        advantage: "HOME",
-        impactDescription: "OKC has a 1-day rest edge — moderate ATS lean.",
-      },
-      situationalAngles: [
-        {
-          name: "Home Underdog",
-          description: "OKC is a home underdog (+6.5). Home dogs cover ATS at 54%.",
-          edge: "LEAN OKC +ATS",
-          confidence: BigInt(54),
-        },
-        {
-          name: "Away Team Back-to-Back",
-          description: "SAS plays on zero days rest (road B2B). Road B2B teams are 44% ATS and fuel UNDER.",
-          edge: "FADE SAS — lean home ATS and UNDER",
-          confidence: BigInt(60),
-        },
-      ],
-      refereeProfile: {
-        name: "Scott Foster",
-        avgFoulsPerGame: 42.1,
-        avgFreeThrowsPerGame: 28.3,
-        overRate: 0.54,
-        tendency: "Over lean — high FT rate inflates totals. Historically favors home teams in close calls.",
-      },
     },
   }),
 
@@ -233,7 +196,6 @@ export const mockBackend: backendInterface = {
         avgFoulsPerGame: 42.1,
         avgFreeThrowsPerGame: 28.3,
         overRate: 0.54,
-        tendency: "Over lean — high FT rate inflates totals.",
       },
       recentTrends: [
         { date: "2026-05-22", opponent: "SAS", teamTotal: 112, gameTotal: 218, overUnder: 224, result: "Under" },
@@ -328,6 +290,4 @@ export const mockBackend: backendInterface = {
 
   getTotalsAIAnalysis: async (_gameId: string, _totalsData: string) =>
     "Mock AI analysis: Game total projected slightly under the implied line based on defensive efficiency trends.",
-
-  updateClosingLine: async (_id: string, _closingLine: string, _preGameLine: string) => ({ __kind__: "ok", ok: true }),
 };

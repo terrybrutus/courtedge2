@@ -400,36 +400,6 @@ function BetCard({ bet, index }: { bet: BetRecommendation; index: number }) {
           </div>
         )}
 
-        {/* CLV score */}
-        {bet.clvScore !== undefined && bet.clvScore !== null && (
-          <div className="mt-3 pt-3 border-t border-border/25 flex items-center justify-between">
-            <span className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">
-              Closing Line Value
-            </span>
-            <span
-              className={cn(
-                "text-[11px] font-mono font-semibold",
-                bet.clvScore > 0 ? "text-primary" : "text-destructive",
-              )}
-            >
-              {bet.clvScore > 0 ? "+" : ""}
-              {bet.clvScore.toFixed(1)} CLV
-            </span>
-          </div>
-        )}
-
-        {/* Closing line */}
-        {bet.closingLine && (
-          <div className="flex items-center justify-between mt-1">
-            <span className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">
-              Closing Line
-            </span>
-            <span className="text-[11px] font-mono text-muted-foreground">
-              {bet.closingLine}
-            </span>
-          </div>
-        )}
-
         {/* Outcome updater for pending */}
         <OutcomeUpdater bet={bet} />
       </div>

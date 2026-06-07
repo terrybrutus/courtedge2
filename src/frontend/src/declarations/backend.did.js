@@ -44,8 +44,6 @@ export const BetRecommendation = IDL.Record({
   'gameDate' : IDL.Text,
   'preGameOdds' : IDL.Opt(IDL.Text),
   'confidence' : IDL.Nat,
-  'closingLine' : IDL.Opt(IDL.Text),
-  'clvScore' : IDL.Opt(IDL.Float64),
 });
 export const BetHistoryStats = IDL.Record({
   'lostBets' : IDL.Nat,
@@ -119,35 +117,6 @@ export const TeamStats = IDL.Record({
   'offensiveRating' : IDL.Opt(IDL.Float64),
   'pointsPerGame' : IDL.Opt(IDL.Float64),
 });
-export const LineMovement = IDL.Record({
-  'openingSpread' : IDL.Opt(IDL.Float64),
-  'currentSpread' : IDL.Opt(IDL.Float64),
-  'spreadMove' : IDL.Float64,
-  'openingTotal' : IDL.Opt(IDL.Float64),
-  'currentTotal' : IDL.Opt(IDL.Float64),
-  'totalMove' : IDL.Float64,
-  'steamAlert' : IDL.Bool,
-  'sharpSide' : IDL.Text,
-});
-export const RestAdvantage = IDL.Record({
-  'homeRestDays' : IDL.Nat,
-  'awayRestDays' : IDL.Nat,
-  'advantage' : IDL.Text,
-  'impactDescription' : IDL.Text,
-});
-export const SituationalAngle = IDL.Record({
-  'name' : IDL.Text,
-  'description' : IDL.Text,
-  'edge' : IDL.Text,
-  'confidence' : IDL.Nat,
-});
-export const RefereeProfile = IDL.Record({
-  'overRate' : IDL.Opt(IDL.Float64),
-  'name' : IDL.Text,
-  'avgFoulsPerGame' : IDL.Opt(IDL.Float64),
-  'avgFreeThrowsPerGame' : IDL.Opt(IDL.Float64),
-  'tendency' : IDL.Text,
-});
 export const GameInvestigation = IDL.Record({
   'game' : Game,
   'odds' : IDL.Vec(OddsLine),
@@ -155,10 +124,6 @@ export const GameInvestigation = IDL.Record({
   'discrepancies' : IDL.Vec(Discrepancy),
   'homeTeamStats' : TeamStats,
   'awayTeamStats' : TeamStats,
-  'lineMovement' : IDL.Opt(LineMovement),
-  'restAdvantage' : IDL.Opt(RestAdvantage),
-  'situationalAngles' : IDL.Vec(SituationalAngle),
-  'refereeProfile' : IDL.Opt(RefereeProfile),
 });
 export const ApiError = IDL.Variant({
   'networkError' : IDL.Text,
@@ -179,6 +144,12 @@ export const PaceProfile = IDL.Record({
   'offensiveEfficiency' : IDL.Float64,
   'teamId' : TeamId,
   'last5Avg' : IDL.Float64,
+});
+export const RefereeProfile = IDL.Record({
+  'overRate' : IDL.Opt(IDL.Float64),
+  'name' : IDL.Text,
+  'avgFoulsPerGame' : IDL.Opt(IDL.Float64),
+  'avgFreeThrowsPerGame' : IDL.Opt(IDL.Float64),
 });
 export const ScoringTrend = IDL.Record({
   'result' : IDL.Text,
@@ -323,11 +294,6 @@ export const idlService = IDL.Service({
       [Result],
       [],
     ),
-  'updateClosingLine' : IDL.Func(
-      [IDL.Text, IDL.Text, IDL.Text],
-      [Result],
-      [],
-    ),
 });
 
 export const idlInitArgs = [];
@@ -369,8 +335,6 @@ export const idlFactory = ({ IDL }) => {
     'gameDate' : IDL.Text,
     'preGameOdds' : IDL.Opt(IDL.Text),
     'confidence' : IDL.Nat,
-    'closingLine' : IDL.Opt(IDL.Text),
-    'clvScore' : IDL.Opt(IDL.Float64),
   });
   const BetHistoryStats = IDL.Record({
     'lostBets' : IDL.Nat,
@@ -444,35 +408,6 @@ export const idlFactory = ({ IDL }) => {
     'offensiveRating' : IDL.Opt(IDL.Float64),
     'pointsPerGame' : IDL.Opt(IDL.Float64),
   });
-  const LineMovement = IDL.Record({
-    'openingSpread' : IDL.Opt(IDL.Float64),
-    'currentSpread' : IDL.Opt(IDL.Float64),
-    'spreadMove' : IDL.Float64,
-    'openingTotal' : IDL.Opt(IDL.Float64),
-    'currentTotal' : IDL.Opt(IDL.Float64),
-    'totalMove' : IDL.Float64,
-    'steamAlert' : IDL.Bool,
-    'sharpSide' : IDL.Text,
-  });
-  const RestAdvantage = IDL.Record({
-    'homeRestDays' : IDL.Nat,
-    'awayRestDays' : IDL.Nat,
-    'advantage' : IDL.Text,
-    'impactDescription' : IDL.Text,
-  });
-  const SituationalAngle = IDL.Record({
-    'name' : IDL.Text,
-    'description' : IDL.Text,
-    'edge' : IDL.Text,
-    'confidence' : IDL.Nat,
-  });
-  const RefereeProfile = IDL.Record({
-    'overRate' : IDL.Opt(IDL.Float64),
-    'name' : IDL.Text,
-    'avgFoulsPerGame' : IDL.Opt(IDL.Float64),
-    'avgFreeThrowsPerGame' : IDL.Opt(IDL.Float64),
-    'tendency' : IDL.Text,
-  });
   const GameInvestigation = IDL.Record({
     'game' : Game,
     'odds' : IDL.Vec(OddsLine),
@@ -480,10 +415,6 @@ export const idlFactory = ({ IDL }) => {
     'discrepancies' : IDL.Vec(Discrepancy),
     'homeTeamStats' : TeamStats,
     'awayTeamStats' : TeamStats,
-    'lineMovement' : IDL.Opt(LineMovement),
-    'restAdvantage' : IDL.Opt(RestAdvantage),
-    'situationalAngles' : IDL.Vec(SituationalAngle),
-    'refereeProfile' : IDL.Opt(RefereeProfile),
   });
   const ApiError = IDL.Variant({
     'networkError' : IDL.Text,
@@ -501,6 +432,12 @@ export const idlFactory = ({ IDL }) => {
     'offensiveEfficiency' : IDL.Float64,
     'teamId' : TeamId,
     'last5Avg' : IDL.Float64,
+  });
+  const RefereeProfile = IDL.Record({
+    'overRate' : IDL.Opt(IDL.Float64),
+    'name' : IDL.Text,
+    'avgFoulsPerGame' : IDL.Opt(IDL.Float64),
+    'avgFreeThrowsPerGame' : IDL.Opt(IDL.Float64),
   });
   const ScoringTrend = IDL.Record({
     'result' : IDL.Text,
@@ -606,7 +543,7 @@ export const idlFactory = ({ IDL }) => {
     'headers' : IDL.Vec(http_header),
   });
   const Result = IDL.Variant({ 'ok' : IDL.Bool, 'err' : ApiError });
-
+  
   return IDL.Service({
     'getApiStatus' : IDL.Func([], [ApiStatus], ['query']),
     'getBetHistory' : IDL.Func([], [IDL.Vec(BetRecommendation)], ['query']),
@@ -636,11 +573,6 @@ export const idlFactory = ({ IDL }) => {
       ),
     'updateBetOutcome' : IDL.Func(
         [IDL.Text, BetStatus, IDL.Opt(IDL.Text)],
-        [Result],
-        [],
-      ),
-    'updateClosingLine' : IDL.Func(
-        [IDL.Text, IDL.Text, IDL.Text],
         [Result],
         [],
       ),

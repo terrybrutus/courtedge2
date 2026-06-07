@@ -1,0 +1,47 @@
+// Version: 1.0.0
+type BetRecommendation__674548424 =
+  {
+    awayTeam : Text;
+    betType : BetType__608848454;
+    confidence : Nat;
+    description : Text;
+    gameDate : Text;
+    gameId : GameId__669134594;
+    gameResult : ?Text;
+    homeTeam : Text;
+    id : Text;
+    preGameOdds : ?Text;
+    reasoning : Text;
+    recommendedAt : Int;
+    result : ?Text;
+    status : BetStatus__927589775;
+    updatedAt : ?Int
+  };
+type BetStatus__927589775 = {#cancelled; #lost; #pending; #push; #won};
+type BetType__608848454 = {#gameTotal; #playerProp; #spread};
+type CacheEntry__861111421 = {storedAt : Int; value : Text};
+type Data__80296667<K, V> =
+  {var count : Nat__1040412405; kvs : [var ?(K, V)]};
+type GameId__669134594 = Text;
+type Internal__41346355<K, V> =
+  {children : [var ?Node__1000929467<K, V>]; data : Data__80296667<K, V>};
+type Leaf__712614010<K, V> = {data : Data__80296667<K, V>};
+type Nat__1040412405 = Nat__920180692;
+type Nat__920180692 = Nat;
+type Node__1000929467<K, V> =
+  {#internal : Internal__41346355<K, V>; #leaf : Leaf__712614010<K, V>};
+actor {
+  stable BDL_API_KEY : Text;
+  stable ODDS_API_KEY : Text;
+  stable OPENAI_API_KEY : Text;
+  stable apiCache :
+    {
+      var root : Node__1000929467<Text, CacheEntry__861111421>;
+      var size : Nat__1040412405
+    };
+  stable betHistory :
+    {
+      var root : Node__1000929467<Text, BetRecommendation__674548424>;
+      var size : Nat__1040412405
+    }
+};

@@ -117,28 +117,6 @@ export interface TransformationOutput {
     body: Uint8Array;
     headers: Array<http_header>;
 }
-export interface LineMovement {
-    openingSpread?: number;
-    currentSpread?: number;
-    spreadMove: number;
-    openingTotal?: number;
-    currentTotal?: number;
-    totalMove: number;
-    steamAlert: boolean;
-    sharpSide: string;
-}
-export interface RestAdvantage {
-    homeRestDays: bigint;
-    awayRestDays: bigint;
-    advantage: string;
-    impactDescription: string;
-}
-export interface SituationalAngle {
-    name: string;
-    description: string;
-    edge: string;
-    confidence: bigint;
-}
 export interface GameInvestigation {
     game: Game;
     odds: Array<OddsLine>;
@@ -146,10 +124,6 @@ export interface GameInvestigation {
     discrepancies: Array<Discrepancy>;
     homeTeamStats: TeamStats;
     awayTeamStats: TeamStats;
-    lineMovement?: LineMovement;
-    restAdvantage?: RestAdvantage;
-    situationalAngles: Array<SituationalAngle>;
-    refereeProfile?: RefereeProfile;
 }
 export interface Game {
     id: GameId;
@@ -225,7 +199,6 @@ export interface RefereeProfile {
     name: string;
     avgFoulsPerGame?: number;
     avgFreeThrowsPerGame?: number;
-    tendency: string;
 }
 export interface PaceProfile {
     defensiveEfficiency: number;
@@ -392,8 +365,6 @@ export interface BetRecommendation {
     gameDate: string;
     preGameOdds?: string;
     confidence: bigint;
-    closingLine?: string;
-    clvScore?: number;
 }
 export enum BetStatus {
     won = "won",
@@ -433,9 +404,8 @@ export interface backendInterface {
     setOpenAIApiKey(_key: string): Promise<void>;
     transform(input: TransformationInput): Promise<TransformationOutput>;
     updateBetOutcome(id: string, status: BetStatus, gameResult: string | null): Promise<Result>;
-    updateClosingLine(id: string, closingLine: string, preGameLine: string): Promise<Result>;
 }
-import type { ApiError as _ApiError, ApiStatus as _ApiStatus, BetRecommendation as _BetRecommendation, BetStatus as _BetStatus, BetType as _BetType, ConfidenceReport as _ConfidenceReport, Discrepancy as _Discrepancy, Game as _Game, GameId as _GameId, GameInvestigation as _GameInvestigation, GameStatus as _GameStatus, GameTotal as _GameTotal, GamesResponse as _GamesResponse, InjuryReport as _InjuryReport, LineMovement as _LineMovement, OddsLine as _OddsLine, PaceProfile as _PaceProfile, Player as _Player, PlayerProp as _PlayerProp, PlayerPropsAnalysis as _PlayerPropsAnalysis, PlayerRecentGame as _PlayerRecentGame, PropLine as _PropLine, RefereeProfile as _RefereeProfile, RestAdvantage as _RestAdvantage, Result as _Result, Result_1 as _Result_1, Result_2 as _Result_2, Result_3 as _Result_3, Result_4 as _Result_4, Result_5 as _Result_5, Result_6 as _Result_6, ScoringTrend as _ScoringTrend, SituationalAngle as _SituationalAngle, Team as _Team, TeamId as _TeamId, TeamStats as _TeamStats, TotalsConfidenceReport as _TotalsConfidenceReport } from "./declarations/backend.did.d.ts";
+import type { ApiError as _ApiError, ApiStatus as _ApiStatus, BetRecommendation as _BetRecommendation, BetStatus as _BetStatus, BetType as _BetType, ConfidenceReport as _ConfidenceReport, Discrepancy as _Discrepancy, Game as _Game, GameId as _GameId, GameInvestigation as _GameInvestigation, GameStatus as _GameStatus, GameTotal as _GameTotal, GamesResponse as _GamesResponse, InjuryReport as _InjuryReport, OddsLine as _OddsLine, PaceProfile as _PaceProfile, Player as _Player, PlayerProp as _PlayerProp, PlayerPropsAnalysis as _PlayerPropsAnalysis, PlayerRecentGame as _PlayerRecentGame, PropLine as _PropLine, RefereeProfile as _RefereeProfile, Result as _Result, Result_1 as _Result_1, Result_2 as _Result_2, Result_3 as _Result_3, Result_4 as _Result_4, Result_5 as _Result_5, Result_6 as _Result_6, ScoringTrend as _ScoringTrend, Team as _Team, TeamId as _TeamId, TeamStats as _TeamStats, TotalsConfidenceReport as _TotalsConfidenceReport } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async getApiStatus(): Promise<ApiStatus> {
@@ -704,20 +674,6 @@ export class Backend implements backendInterface {
             return from_candid_Result_n64(this._uploadFile, this._downloadFile, result);
         }
     }
-    async updateClosingLine(arg0: string, arg1: string, arg2: string): Promise<Result> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.updateClosingLine(arg0, arg1, arg2);
-                return from_candid_Result_n64(this._uploadFile, this._downloadFile, result);
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.updateClosingLine(arg0, arg1, arg2);
-            return from_candid_Result_n64(this._uploadFile, this._downloadFile, result);
-        }
-    }
 }
 function from_candid_ApiError_n26(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ApiError): ApiError {
     return from_candid_variant_n27(_uploadFile, _downloadFile, value);
@@ -791,30 +747,6 @@ function from_candid_TeamStats_n24(_uploadFile: (file: ExternalBlob) => Promise<
 function from_candid_TotalsConfidenceReport_n36(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _TotalsConfidenceReport): TotalsConfidenceReport {
     return from_candid_record_n37(_uploadFile, _downloadFile, value);
 }
-function from_candid_opt_lineMovement(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_LineMovement]): LineMovement | null {
-    if (value.length === 0) return null;
-    const v = value[0];
-    return {
-        openingSpread: record_opt_to_undefined(from_candid_opt_n23(_uploadFile, _downloadFile, v.openingSpread)),
-        currentSpread: record_opt_to_undefined(from_candid_opt_n23(_uploadFile, _downloadFile, v.currentSpread)),
-        spreadMove: v.spreadMove,
-        openingTotal: record_opt_to_undefined(from_candid_opt_n23(_uploadFile, _downloadFile, v.openingTotal)),
-        currentTotal: record_opt_to_undefined(from_candid_opt_n23(_uploadFile, _downloadFile, v.currentTotal)),
-        totalMove: v.totalMove,
-        steamAlert: v.steamAlert,
-        sharpSide: v.sharpSide,
-    };
-}
-function from_candid_opt_restAdvantage(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_RestAdvantage]): RestAdvantage | null {
-    if (value.length === 0) return null;
-    const v = value[0];
-    return {
-        homeRestDays: v.homeRestDays,
-        awayRestDays: v.awayRestDays,
-        advantage: v.advantage,
-        impactDescription: v.impactDescription,
-    };
-}
 function from_candid_opt_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [bigint]): bigint | null {
     return value.length === 0 ? null : value[0];
 }
@@ -833,18 +765,28 @@ function from_candid_opt_n35(_uploadFile: (file: ExternalBlob) => Promise<Uint8A
 function from_candid_opt_n47(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_ConfidenceReport]): ConfidenceReport | null {
     return value.length === 0 ? null : from_candid_ConfidenceReport_n48(_uploadFile, _downloadFile, value[0]);
 }
-function from_candid_record_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _GameInvestigation): GameInvestigation {
+function from_candid_record_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    game: _Game;
+    odds: Array<_OddsLine>;
+    injuries: Array<_InjuryReport>;
+    discrepancies: Array<_Discrepancy>;
+    homeTeamStats: _TeamStats;
+    awayTeamStats: _TeamStats;
+}): {
+    game: Game;
+    odds: Array<OddsLine>;
+    injuries: Array<InjuryReport>;
+    discrepancies: Array<Discrepancy>;
+    homeTeamStats: TeamStats;
+    awayTeamStats: TeamStats;
+} {
     return {
         game: from_candid_Game_n16(_uploadFile, _downloadFile, value.game),
         odds: from_candid_vec_n20(_uploadFile, _downloadFile, value.odds),
         injuries: value.injuries,
         discrepancies: value.discrepancies,
         homeTeamStats: from_candid_TeamStats_n24(_uploadFile, _downloadFile, value.homeTeamStats),
-        awayTeamStats: from_candid_TeamStats_n24(_uploadFile, _downloadFile, value.awayTeamStats),
-        lineMovement: record_opt_to_undefined(from_candid_opt_lineMovement(_uploadFile, _downloadFile, value.lineMovement)),
-        restAdvantage: record_opt_to_undefined(from_candid_opt_restAdvantage(_uploadFile, _downloadFile, value.restAdvantage)),
-        situationalAngles: value.situationalAngles,
-        refereeProfile: record_opt_to_undefined(from_candid_opt_n32(_uploadFile, _downloadFile, value.refereeProfile)),
+        awayTeamStats: from_candid_TeamStats_n24(_uploadFile, _downloadFile, value.awayTeamStats)
     };
 }
 function from_candid_record_n17(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
@@ -1003,13 +945,22 @@ function from_candid_record_n31(_uploadFile: (file: ExternalBlob) => Promise<Uin
         injuryImpact: value.injuryImpact
     };
 }
-function from_candid_record_n34(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _RefereeProfile): RefereeProfile {
+function from_candid_record_n34(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    overRate: [] | [number];
+    name: string;
+    avgFoulsPerGame: [] | [number];
+    avgFreeThrowsPerGame: [] | [number];
+}): {
+    overRate?: number;
+    name: string;
+    avgFoulsPerGame?: number;
+    avgFreeThrowsPerGame?: number;
+} {
     return {
         overRate: record_opt_to_undefined(from_candid_opt_n23(_uploadFile, _downloadFile, value.overRate)),
         name: value.name,
         avgFoulsPerGame: record_opt_to_undefined(from_candid_opt_n23(_uploadFile, _downloadFile, value.avgFoulsPerGame)),
-        avgFreeThrowsPerGame: record_opt_to_undefined(from_candid_opt_n23(_uploadFile, _downloadFile, value.avgFreeThrowsPerGame)),
-        tendency: value.tendency,
+        avgFreeThrowsPerGame: record_opt_to_undefined(from_candid_opt_n23(_uploadFile, _downloadFile, value.avgFreeThrowsPerGame))
     };
 }
 function from_candid_record_n37(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
@@ -1129,7 +1080,39 @@ function from_candid_record_n53(_uploadFile: (file: ExternalBlob) => Promise<Uin
         games: from_candid_vec_n54(_uploadFile, _downloadFile, value.games)
     };
 }
-function from_candid_record_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _BetRecommendation): BetRecommendation {
+function from_candid_record_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: string;
+    status: _BetStatus;
+    result: [] | [string];
+    homeTeam: string;
+    gameResult: [] | [string];
+    betType: _BetType;
+    gameId: _GameId;
+    description: string;
+    reasoning: string;
+    updatedAt: [] | [bigint];
+    recommendedAt: bigint;
+    awayTeam: string;
+    gameDate: string;
+    preGameOdds: [] | [string];
+    confidence: bigint;
+}): {
+    id: string;
+    status: BetStatus;
+    result?: string;
+    homeTeam: string;
+    gameResult?: string;
+    betType: BetType;
+    gameId: GameId;
+    description: string;
+    reasoning: string;
+    updatedAt?: bigint;
+    recommendedAt: bigint;
+    awayTeam: string;
+    gameDate: string;
+    preGameOdds?: string;
+    confidence: bigint;
+} {
     return {
         id: value.id,
         status: from_candid_BetStatus_n7(_uploadFile, _downloadFile, value.status),
@@ -1145,9 +1128,7 @@ function from_candid_record_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint
         awayTeam: value.awayTeam,
         gameDate: value.gameDate,
         preGameOdds: record_opt_to_undefined(from_candid_opt_n3(_uploadFile, _downloadFile, value.preGameOdds)),
-        confidence: value.confidence,
-        closingLine: record_opt_to_undefined(from_candid_opt_n3(_uploadFile, _downloadFile, value.closingLine)),
-        clvScore: record_opt_to_undefined(from_candid_opt_n23(_uploadFile, _downloadFile, value.clvScore)),
+        confidence: value.confidence
     };
 }
 function from_candid_variant_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
@@ -1383,7 +1364,39 @@ function to_candid_BetType_n59(_uploadFile: (file: ExternalBlob) => Promise<Uint
 function to_candid_opt_n63(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: string | null): [] | [string] {
     return value === null ? candid_none() : candid_some(value);
 }
-function to_candid_record_n56(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: BetRecommendation): _BetRecommendation {
+function to_candid_record_n56(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: string;
+    status: BetStatus;
+    result?: string;
+    homeTeam: string;
+    gameResult?: string;
+    betType: BetType;
+    gameId: GameId;
+    description: string;
+    reasoning: string;
+    updatedAt?: bigint;
+    recommendedAt: bigint;
+    awayTeam: string;
+    gameDate: string;
+    preGameOdds?: string;
+    confidence: bigint;
+}): {
+    id: string;
+    status: _BetStatus;
+    result: [] | [string];
+    homeTeam: string;
+    gameResult: [] | [string];
+    betType: _BetType;
+    gameId: _GameId;
+    description: string;
+    reasoning: string;
+    updatedAt: [] | [bigint];
+    recommendedAt: bigint;
+    awayTeam: string;
+    gameDate: string;
+    preGameOdds: [] | [string];
+    confidence: bigint;
+} {
     return {
         id: value.id,
         status: to_candid_BetStatus_n57(_uploadFile, _downloadFile, value.status),
@@ -1399,9 +1412,7 @@ function to_candid_record_n56(_uploadFile: (file: ExternalBlob) => Promise<Uint8
         awayTeam: value.awayTeam,
         gameDate: value.gameDate,
         preGameOdds: value.preGameOdds ? candid_some(value.preGameOdds) : candid_none(),
-        confidence: value.confidence,
-        closingLine: value.closingLine ? candid_some(value.closingLine) : candid_none(),
-        clvScore: value.clvScore !== undefined ? candid_some(value.clvScore) : candid_none(),
+        confidence: value.confidence
     };
 }
 function to_candid_variant_n58(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: BetStatus): {

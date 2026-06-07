@@ -1,0 +1,325 @@
+type http_request_result = 
+ record {
+   body: blob;
+   headers: vec http_header;
+   status: nat;
+ };
+type http_header = 
+ record {
+   name: text;
+   value: text;
+ };
+type TransformationOutput = 
+ record {
+   body: blob;
+   headers: vec http_header;
+   status: nat;
+ };
+type TransformationInput = 
+ record {
+   context: blob;
+   response: http_request_result;
+ };
+type TotalsConfidenceReport = 
+ record {
+   grade: text;
+   keyFactors: vec text;
+   overUnderEdge: text;
+   projectedTotal: opt float64;
+   reasoning: text;
+   recommendation: text;
+   score: nat;
+ };
+type TeamStats = 
+ record {
+   defensiveRating: opt float64;
+   homeAwayRecord: text;
+   offensiveRating: opt float64;
+   pace: opt float64;
+   pointsPerGame: opt float64;
+   recentForm: vec nat;
+   restDays: nat;
+   teamId: TeamId;
+ };
+type TeamId = text;
+type Team = 
+ record {
+   abbreviation: text;
+   city: text;
+   id: TeamId;
+   name: text;
+   "record": text;
+ };
+type ScoringTrend = 
+ record {
+   date: text;
+   gameTotal: float64;
+   opponent: text;
+   overUnder: float64;
+   result: text;
+   teamTotal: float64;
+ };
+type Result_6 = 
+ variant {
+   err: ApiError;
+   ok: GameInvestigation;
+ };
+type Result_5 = 
+ variant {
+   err: ApiError;
+   ok: GameTotal;
+ };
+type Result_4 = 
+ variant {
+   err: ApiError;
+   ok: vec OddsLine;
+ };
+type Result_3 = 
+ variant {
+   err: ApiError;
+   ok: PlayerPropsAnalysis;
+ };
+type Result_2 = 
+ variant {
+   err: ApiError;
+   ok: GamesResponse;
+ };
+type Result_1 = 
+ variant {
+   err: ApiError;
+   ok: text;
+ };
+type Result = 
+ variant {
+   err: ApiError;
+   ok: bool;
+ };
+type RefereeProfile = 
+ record {
+   avgFoulsPerGame: opt float64;
+   avgFreeThrowsPerGame: opt float64;
+   name: text;
+   overRate: opt float64;
+ };
+type PropLine = 
+ record {
+   bookmaker: text;
+   line: float64;
+   overOdds: int;
+   underOdds: int;
+ };
+type PlayerRecentGame = 
+ record {
+   date: text;
+   fieldGoalAttempts: float64;
+   minutes: float64;
+   opponent: text;
+   points: float64;
+   usageRate: float64;
+ };
+type PlayerPropsAnalysis = 
+ record {
+   analysisGeneratedAt: text;
+   gameId: GameId;
+   players: vec PlayerProp;
+ };
+type PlayerProp = 
+ record {
+   backToBack: bool;
+   confidenceReport: opt ConfidenceReport;
+   homeAwaySplit: float64;
+   matchupDefRating: opt float64;
+   player: Player;
+   propLines: vec PropLine;
+   recentGames: vec PlayerRecentGame;
+   seasonAvgMinutes: float64;
+   seasonAvgPoints: float64;
+   seasonUsageRate: float64;
+ };
+type PlayerId = text;
+type Player = 
+ record {
+   id: PlayerId;
+   injuryStatus: text;
+   jerseyNumber: text;
+   name: text;
+   position: text;
+   team: text;
+ };
+type PaceProfile = 
+ record {
+   avgPointsAgainst: float64;
+   avgPointsFor: float64;
+   defensiveEfficiency: float64;
+   last5Avg: float64;
+   offensiveEfficiency: float64;
+   pace: float64;
+   teamId: TeamId;
+ };
+type OddsLine = 
+ record {
+   awayMoneyline: opt int;
+   awaySpread: opt float64;
+   awaySpreadOdds: opt int;
+   bookmaker: text;
+   homeMoneyline: opt int;
+   homeSpread: opt float64;
+   homeSpreadOdds: opt int;
+   overOdds: opt int;
+   overUnder: opt float64;
+   underOdds: opt int;
+   updatedAt: text;
+ };
+type InjuryReport = 
+ record {
+   description: text;
+   playerId: PlayerId;
+   playerName: text;
+   status: text;
+   team: text;
+   updatedAt: text;
+ };
+type GamesResponse = 
+ record {
+   games: vec Game;
+   gamesDate: text;
+   isUpcomingDate: bool;
+ };
+type GameTotal = 
+ record {
+   awayPace: PaceProfile;
+   confidenceReport: opt TotalsConfidenceReport;
+   gameId: GameId;
+   homePace: PaceProfile;
+   impliedTotal: opt float64;
+   injuryImpact: text;
+   projectedTotal: opt float64;
+   recentTrends: vec ScoringTrend;
+   refereeProfile: opt RefereeProfile;
+ };
+type GameStatus = 
+ variant {
+   final;
+   inProgress;
+   postponed;
+   scheduled;
+ };
+type GameInvestigation = 
+ record {
+   awayTeamStats: TeamStats;
+   discrepancies: vec Discrepancy;
+   game: Game;
+   homeTeamStats: TeamStats;
+   injuries: vec InjuryReport;
+   odds: vec OddsLine;
+ };
+type GameId = text;
+type Game = 
+ record {
+   awayTeam: Team;
+   displayTime: text;
+   gameTime: text;
+   homeTeam: Team;
+   id: GameId;
+   odds: vec OddsLine;
+   series: opt text;
+   status: GameStatus;
+   venue: text;
+ };
+type Discrepancy = 
+ record {
+   betType: text;
+   gap: float64;
+   maxBook: text;
+   maxValue: float64;
+   minBook: text;
+   minValue: float64;
+ };
+type ConfidenceReport = 
+ record {
+   grade: text;
+   keyFactors: vec text;
+   projectedPoints: opt float64;
+   reasoning: text;
+   recommendation: text;
+   score: nat;
+ };
+type BetType = 
+ variant {
+   gameTotal;
+   playerProp;
+   spread;
+ };
+type BetStatus = 
+ variant {
+   cancelled;
+   lost;
+   pending;
+   push;
+   won;
+ };
+type BetRecommendation = 
+ record {
+   awayTeam: text;
+   betType: BetType;
+   confidence: nat;
+   description: text;
+   gameDate: text;
+   gameId: GameId;
+   gameResult: opt text;
+   homeTeam: text;
+   id: text;
+   preGameOdds: opt text;
+   reasoning: text;
+   recommendedAt: int;
+   result: opt text;
+   status: BetStatus;
+   updatedAt: opt int;
+ };
+type BetHistoryStats = 
+ record {
+   lostBets: nat;
+   pendingBets: nat;
+   totalBets: nat;
+   winRate: float64;
+   wonBets: nat;
+ };
+type ApiStatus = 
+ record {
+   bdlApiConfigured: bool;
+   lastBdlCallStatus: opt text;
+   lastOddsApiCallStatus: opt text;
+   oddsApiConfigured: bool;
+   openAiConfigured: bool;
+ };
+type ApiError = 
+ variant {
+   networkError: text;
+   notFound: text;
+   parseError: text;
+   rateLimited: text;
+   unavailable: text;
+ };
+service : {
+  getApiStatus: () -> (ApiStatus) query;
+  getBetHistory: () -> (vec BetRecommendation) query;
+  getBetHistoryStats: () -> (BetHistoryStats) query;
+  getGameInvestigation: (gameId: GameId, gameDate: text) -> (Result_6);
+  getGameTotalsAnalysis: (gameId: GameId, homeTeamName: text, awayTeamName:
+   text) -> (Result_5);
+  getMultiBookOdds: (gameId: GameId) -> (Result_4);
+  getPlayerPropsAnalysis: (gameId: GameId) -> (Result_3);
+  getPropsAIAnalysis: (gameId: text, playerData: text) -> (text);
+  getTodaysGames: () -> (Result_2);
+  getTotalsAIAnalysis: (gameId: text, totalsData: text) -> (text);
+  isBdlApiConfigured: () -> (bool) query;
+  isOddsApiConfigured: () -> (bool) query;
+  isOpenAIConfigured: () -> (bool) query;
+  saveBetRecommendation: (rec: BetRecommendation) -> (Result_1);
+  setBdlApiKey: (_key: text) -> ();
+  setOddsApiKey: (_key: text) -> ();
+  setOpenAIApiKey: (_key: text) -> ();
+  transform: (input: TransformationInput) -> (TransformationOutput) query;
+  updateBetOutcome: (id: text, status: BetStatus, gameResult: opt text) ->
+   (Result);
+}

@@ -31,8 +31,6 @@ module {
     status : BetStatus;
     gameResult : ?Text;
     updatedAt : ?Int;
-    closingLine : ?Text;   // recorded after market closes for CLV tracking
-    clvScore : ?Float;     // positive = beat closing line (winning process signal)
   };
 
   public type BetHistoryStats = {

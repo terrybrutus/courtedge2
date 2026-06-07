@@ -45,8 +45,6 @@ export interface BetRecommendation {
   'gameDate' : string,
   'preGameOdds' : [] | [string],
   'confidence' : bigint,
-  'closingLine' : [] | [string],
-  'clvScore' : [] | [number],
 }
 export type BetStatus = { 'won' : null } |
   { 'cancelled' : null } |
@@ -84,28 +82,6 @@ export interface Game {
   'gameTime' : string,
 }
 export type GameId = string;
-export interface LineMovement {
-  'openingSpread' : [] | [number],
-  'currentSpread' : [] | [number],
-  'spreadMove' : number,
-  'openingTotal' : [] | [number],
-  'currentTotal' : [] | [number],
-  'totalMove' : number,
-  'steamAlert' : boolean,
-  'sharpSide' : string,
-}
-export interface RestAdvantage {
-  'homeRestDays' : bigint,
-  'awayRestDays' : bigint,
-  'advantage' : string,
-  'impactDescription' : string,
-}
-export interface SituationalAngle {
-  'name' : string,
-  'description' : string,
-  'edge' : string,
-  'confidence' : bigint,
-}
 export interface GameInvestigation {
   'game' : Game,
   'odds' : Array<OddsLine>,
@@ -113,10 +89,6 @@ export interface GameInvestigation {
   'discrepancies' : Array<Discrepancy>,
   'homeTeamStats' : TeamStats,
   'awayTeamStats' : TeamStats,
-  'lineMovement' : [] | [LineMovement],
-  'restAdvantage' : [] | [RestAdvantage],
-  'situationalAngles' : Array<SituationalAngle>,
-  'refereeProfile' : [] | [RefereeProfile],
 }
 export type GameStatus = { 'final' : null } |
   { 'scheduled' : null } |
@@ -213,7 +185,6 @@ export interface RefereeProfile {
   'name' : string,
   'avgFoulsPerGame' : [] | [number],
   'avgFreeThrowsPerGame' : [] | [number],
-  'tendency' : string,
 }
 export type Result = { 'ok' : boolean } |
   { 'err' : ApiError };
@@ -299,7 +270,6 @@ export interface _SERVICE {
   'setOpenAIApiKey' : ActorMethod<[string], undefined>,
   'transform' : ActorMethod<[TransformationInput], TransformationOutput>,
   'updateBetOutcome' : ActorMethod<[string, BetStatus, [] | [string]], Result>,
-  'updateClosingLine' : ActorMethod<[string, string, string], Result>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

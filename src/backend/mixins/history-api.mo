@@ -5,7 +5,6 @@ import Time "mo:core/Time";
 import Float "mo:core/Float";
 import Array "mo:core/Array";
 import Nat "mo:core/Nat";
-import GamesLib "../lib/games";
 
 mixin () {
   let betHistory : Map.Map<Text, HistoryTypes.BetRecommendation> = Map.empty();
@@ -89,46 +88,6 @@ mixin () {
       i += 1;
     };
     ctx;
-  };
-
-  // ── Write: record closing line + CLV score for a completed bet ───────────────
-  // closingLine: the line at market close (e.g. "-6.5" or "224.5")
-  // preGameLine: the line at time of bet pick (from bet.preGameOdds)
-  // Positive CLV = beat the closing line = good process regardless of outcome
-  public func updateClosingLine(id : Text, closingLine : Text, preGameLine : Text) : async CommonTypes.Result<Bool> {
-    switch (betHistory.get(id)) {
-      case null #err(#notFound("Bet " # id # " not found"));
-      case (?existing) {
-        let clvScore : ?Float = computeClv(preGameLine, closingLine, existing.betType);
-        let updated : HistoryTypes.BetRecommendation = {
-          existing with
-          closingLine = ?closingLine;
-          clvScore;
-          updatedAt = ?(Time.now());
-        };
-        betHistory.add(id, updated);
-        #ok(true);
-      };
-    };
-  };
-
-  // Compute CLV: positive = beat closing line (good bet), negative = didn't beat closing line.
-  func computeClv(preGameOdds : ?Text, closingLine : Text, betType : HistoryTypes.BetType) : ?Float {
-    switch (betType, preGameOdds) {
-      case (#spread, ?pgOdds) {
-        // For spreads: CLV = preGameSpread - closingSpread (positive = got better number)
-        let pg = switch (GamesLib.parseFloatText(pgOdds)) { case (?f) f; case null return null };
-        let cl = switch (GamesLib.parseFloatText(closingLine)) { case (?f) f; case null return null };
-        ?(pg - cl);
-      };
-      case (#gameTotal, ?pgOdds) {
-        // For totals (OVER bet): CLV = closingTotal - preGameTotal (positive = total moved up = good for over)
-        let pg = switch (GamesLib.parseFloatText(pgOdds)) { case (?f) f; case null return null };
-        let cl = switch (GamesLib.parseFloatText(closingLine)) { case (?f) f; case null return null };
-        ?(cl - pg);
-      };
-      case _ null;
-    };
   };
 
   // Collect map entries into an array
