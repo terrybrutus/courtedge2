@@ -43,13 +43,26 @@ module {
   };
 
   // Parse BDL status field into GameStatus and a display time string.
-  // BDL status: "7:30 pm ET" (scheduled), "Final" or "Final/OT" (done), "Q3 2:15" (live)
+  // BDL status: "7:30 pm ET" (scheduled), "Final" or "Final/OT" (done), "Q3 2:15" (live),
+  // or an ISO UTC timestamp like "2026-06-09T00:30:00Z" for upcoming games.
   public func parseBdlStatus(status : Text) : (GameTypes.GameStatus, Text) {
     if (textContains(status, "Final")) {
       (#final, "Final");
     } else if (textContains(status, "ET")) {
       // Scheduled: parse display time from status like "7:30 pm ET"
       let displayTime = parseBdlTime(status);
+      (#scheduled, displayTime);
+    } else if (status.size() >= 19 and textContains(status, "T") and textContains(status, "Z")) {
+      // BDL v1 returns ISO UTC timestamp for scheduled games (e.g. "2026-06-09T00:30:00Z")
+      // Convert UTC to ET display time (subtract 4h for EDT)
+      let epoch = parseIsoToEpoch(status);
+      let etEpochNat = if (epoch <= 4 * 3600) 0 else Int.abs(epoch) - 4 * 3600;
+      let hh = (etEpochNat % 86400) / 3600;
+      let mm = (etEpochNat % 3600) / 60;
+      let period = if (hh >= 12) "PM" else "AM";
+      let displayHour = if (hh == 0) 12 else if (hh > 12) hh - 12 else hh;
+      let pad2 = func(n : Nat) : Text { if (n < 10) "0" # n.toText() else n.toText() };
+      let displayTime = displayHour.toText() # ":" # pad2(mm) # " " # period # " ET";
       (#scheduled, displayTime);
     } else if (status == "" or status == "0") {
       (#scheduled, "");
@@ -202,24 +215,21 @@ module {
         epochSecsToIso(nowSecs);
       };
       case _ {
-        // Scheduled — parse "7:30 pm ET" → UTC ISO
-        if (not textContains(statusRaw, "ET")) {
-          // No time info — use midnight UTC
+        // Scheduled — parse time to UTC ISO
+        if (statusRaw.size() >= 19 and textContains(statusRaw, "T") and textContains(statusRaw, "Z")) {
+          // statusRaw is already a UTC ISO timestamp from BDL v1 — use directly
+          statusRaw;
+        } else if (not textContains(statusRaw, "ET")) {
+          // No time info — use midnight UTC of the game date
           dateStr # "T00:00:00Z";
         } else {
-          // Parse hours and minutes from status like "7:30 pm ET"
+          // Parse "7:30 pm ET" → UTC ISO
           let (hour24, minute) = parseEtTime(statusRaw);
-          // Add 4 hours to convert ET→UTC (EDT offset during playoffs)
           let utcHour = (hour24 + 4) % 24;
           let pad = func(n : Nat) : Text {
             if (n < 10) "0" # n.toText() else n.toText()
           };
-          // If adding 4h crosses midnight, advance the date
-          let finalDate = if (hour24 + 4 >= 24) {
-            advanceDateByOne(dateStr);
-          } else {
-            dateStr;
-          };
+          let finalDate = if (hour24 + 4 >= 24) advanceDateByOne(dateStr) else dateStr;
           finalDate # "T" # pad(utcHour) # ":" # pad(minute) # ":00Z";
         };
       };
@@ -1048,12 +1058,22 @@ module {
     if (iso.size() >= 10) textSubstring(iso, 0, 10) else iso;
   };
 
-  // Find the earliest game date across a list of games (returns fallback if list is empty).
+  // Convert a UTC ISO gameTime to its ET date string (UTC−4 for EDT during playoffs).
+  // E.g. "2026-06-09T00:30:00Z" → "2026-06-08" (8:30 PM ET on June 8)
+  func etDateFromGameTime(gameTime : Text) : Text {
+    if (gameTime.size() < 20) return datePart(gameTime);
+    let epoch = parseIsoToEpoch(gameTime);
+    if (epoch <= 4 * 3600) return datePart(gameTime);
+    let etNat = Int.abs(epoch) - 4 * 3600;
+    textSubstring(epochSecsToIso(etNat), 0, 10);
+  };
+
+  // Find the earliest game date (in ET) across a list of games (returns fallback if empty).
   public func earliestGameDate(games : [GameTypes.Game], fallback : Text) : Text {
     var earliest = fallback;
     var found = false;
     for (g in games.vals()) {
-      let d = datePart(g.gameTime);
+      let d = etDateFromGameTime(g.gameTime);
       if (d.size() == 10) {
         if (not found or d < earliest) {
           earliest := d;
@@ -1064,11 +1084,11 @@ module {
     earliest;
   };
 
-  // Filter games to only those whose gameTime date matches targetDate (YYYY-MM-DD).
+  // Filter games to only those whose ET game date matches targetDate (YYYY-MM-DD).
   public func filterGamesByDate(games : [GameTypes.Game], targetDate : Text) : [GameTypes.Game] {
     var result : [GameTypes.Game] = [];
     for (g in games.vals()) {
-      if (datePart(g.gameTime) == targetDate) {
+      if (etDateFromGameTime(g.gameTime) == targetDate) {
         result := result.concat([g]);
       };
     };

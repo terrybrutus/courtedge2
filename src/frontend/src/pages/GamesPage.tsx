@@ -79,12 +79,25 @@ function OddsTeaser({
   );
 }
 
+// Parse ISO UTC string to "H:MM PM ET" display string (client-side fallback)
+function formatIsoToEtDisplay(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: "America/New_York",
+    timeZoneName: "short",
+  });
+}
+
 // ─── Game card ────────────────────────────────────────────────────────────────
 function GameCard({
   game,
   index,
   gamesDate,
-}: { game: Game; index: number; gamesDate: string }) {
+  isUpcoming,
+}: { game: Game; index: number; gamesDate: string; isUpcoming: boolean }) {
   const statusConfig = getStatusConfig(game.status);
   const statusStr = (game.status as unknown as string) ?? "";
   const isLive =
@@ -92,7 +105,12 @@ function GameCard({
     statusStr.toUpperCase().includes("IN_PROGRESS");
   const isFinal = statusStr === "final" || statusStr.startsWith("final_");
 
-  const gameTime = game.displayTime || "TBD";
+  // displayTime may be "8:30 PM ET" (correct) or an ISO string (backend not yet updated)
+  const rawDisplay = game.displayTime || "";
+  const isIsoDisplay = rawDisplay.includes("T") && rawDisplay.includes("Z");
+  const gameTime = isIsoDisplay
+    ? formatIsoToEtDisplay(rawDisplay)
+    : rawDisplay || "TBD";
 
   return (
     <motion.div
@@ -150,7 +168,9 @@ function GameCard({
                   <>
                     <Clock className="w-3 h-3 text-muted-foreground/60" />
                     <span className="text-[11px] font-mono font-semibold text-foreground/80">
-                      {gameTime}
+                      {isUpcoming
+                        ? `${new Date(`${gamesDate}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric" })} · ${gameTime}`
+                        : gameTime}
                     </span>
                   </>
                 )}
@@ -325,9 +345,7 @@ export default function GamesPage() {
     });
   };
 
-  const pageTitle = isUpcomingDate
-    ? `Next Games: ${formatGamesDate(gamesDate)}`
-    : "Today's Games";
+  const pageTitle = isUpcomingDate ? "Upcoming Games" : "Today's Games";
 
   const todayLabel = new Date().toLocaleDateString("en-US", {
     weekday: "long",
@@ -379,7 +397,7 @@ export default function GamesPage() {
             </h1>
             <p className="text-sm font-body text-muted-foreground mt-0.5">
               {isUpcomingDate
-                ? `No games today — next slate on ${formatGamesDate(gamesDate)}`
+                ? `Next slate: ${formatGamesDate(gamesDate)}`
                 : "Select a game to open the investigation room"}
             </p>
           </div>
@@ -421,10 +439,10 @@ export default function GamesPage() {
             <Calendar className="w-4 h-4 text-accent shrink-0" />
             <div>
               <p className="text-sm font-mono font-semibold text-accent">
-                No games today — Next Games: {formatGamesDate(gamesDate)}
+                No games today · Showing slate for {formatGamesDate(gamesDate)}
               </p>
               <p className="text-[11px] font-body text-muted-foreground">
-                Showing the upcoming playoff slate · Check back on game day
+                Odds and analysis available for these upcoming games
               </p>
             </div>
           </motion.div>
@@ -530,6 +548,7 @@ export default function GamesPage() {
               game={game}
               index={i}
               gamesDate={gamesDate}
+              isUpcoming={isUpcomingDate}
             />
           ))}
         </div>
