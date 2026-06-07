@@ -1,0 +1,24 @@
+{
+  "overview": "An immersive NBA playoff betting research app that delivers obsessive depth on Player Points Props and Game Totals, with a full investigation room per game, AI-powered confidence reasoning, and multi-book odds analysis.",
+  "features": [
+    "Today's NBA playoff games dashboard with live odds and game status",
+    "Investigation room per game — click to go deep on any matchup",
+    "Player Points Props analysis: usage rate, matchup defensive rating, recent form, injury adjustments, AI confidence reasoning",
+    "Game Totals/O/U analysis: team pace, offensive/defensive efficiency, scoring trends, referee tendencies, AI confidence reasoning",
+    "Live odds from multiple sportsbooks with line discrepancy highlighting",
+    "Confidence meters (0-100) with plain-language AI explanations for every bet",
+    "Backend data integration from SportsFBI, ESPN, The Odds API, and API-Sports/API-NBA"
+  ],
+  "category": "sports-research-tool",
+  "tags": [
+    "nba",
+    "sports-betting",
+    "basketball",
+    "playoffs",
+    "ai-analysis",
+    "odds",
+    "props",
+    "research"
+  ],
+  "last_updated": "2026-05-24T03:21:58.966Z"
+}
