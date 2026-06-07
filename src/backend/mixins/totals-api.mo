@@ -145,7 +145,7 @@ mixin (bdlApiKey : Text, openAIApiKey : Text, httpTransform : shared query OutCa
 
   // On-demand AI analysis for game totals — only called when user clicks "Analyze with AI".
   public func getTotalsAIAnalysis(gameId : Text, totalsData : Text) : async Text {
-    let historyCtx = getHistoryContext();
+    let historyCtx = "";
     let aiSystemPrompt = "You are CourtEdge AI, a professional NBA betting analyst. Focus on game totals (over/under). Be selective — only recommend when multiple signals align.";
     let sanitized = totalsData.replace(#text "\"", "'");
     let cleanHistory = historyCtx.replace(#text "\"", "'");

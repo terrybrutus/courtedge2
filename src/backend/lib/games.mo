@@ -15,21 +15,21 @@ module {
   public func computeTodayDateStr() : Text {
     let nowNanos = Int.abs(Time.now());
     let nowSecs = nowNanos / 1_000_000_000;
-    var days = nowSecs / 86400;
-    // Gregorian calendar computation (proleptic)
-    var era = (days + 719468) / 146097;
-    var doe = (days + 719468) - era * 146097;
-    var yoe = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365;
-    var y = yoe + era * 400;
-    var doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
-    var mp = (5 * doy + 2) / 153;
-    var d = doy - (153 * mp + 2) / 5 + 1;
-    var m = if (mp < 10) { mp + 3 } else { mp - 9 };
-    if (m <= 2) { y := y + 1 };
-    let pad = func(n : Nat) : Text {
-      if (n < 10) { "0" # n.toText() } else { n.toText() }
+    // Work in Int to avoid Nat underflow traps in Gregorian calculation
+    let days : Int = (nowSecs / 86400 : Nat);
+    let era : Int = (days + 719468) / 146097;
+    let doe : Int = (days + 719468) - era * 146097;
+    let yoe : Int = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365;
+    var y : Int = yoe + era * 400;
+    let doy : Int = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    let mp : Int = (5 * doy + 2) / 153;
+    let d : Int = doy - (153 * mp + 2) / 5 + 1;
+    let m : Int = if (mp < 10) { mp + 3 } else { mp - 9 };
+    if (m <= 2) { y += 1 };
+    let pad = func(n : Int) : Text {
+      if (n < 10) { "0" # Int.toText(n) } else { Int.toText(n) }
     };
-    y.toText() # "-" # pad(m) # "-" # pad(d)
+    Int.toText(y) # "-" # pad(m) # "-" # pad(d)
   };
 
   // Build Ball Don't Lie games URL for a given date string.
