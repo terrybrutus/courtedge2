@@ -22,14 +22,14 @@ export function useTodayGames() {
     queryFn: async () => {
       if (!actor) throw new Error("Actor not ready");
       const result = await actor.getTodaysGames();
-      console.log("[CourtEdge] Raw games response:", result);
+      console.log("[EdgeStack] Raw games response:", result);
       if (result.__kind__ === "err") {
         const msg = getApiErrorMessage(result.err);
-        console.log("[CourtEdge] Empty state reason:", msg);
+        console.log("[EdgeStack] Empty state reason:", msg);
         throw new Error(msg);
       }
       console.log(
-        "[CourtEdge] Parsed game count:",
+        "[EdgeStack] Parsed game count:",
         result.ok.games.length,
         "date:",
         result.ok.gamesDate,
@@ -54,10 +54,10 @@ export function useGameDetail(gameId: string, gameDate = "") {
       if (!actor || !gameId)
         throw new Error("Actor not ready or missing game ID");
       const result = await actor.getGameInvestigation(gameId, gameDate);
-      console.log("[CourtEdge] Raw investigation response:", result);
+      console.log("[EdgeStack] Raw investigation response:", result);
       if (result.__kind__ === "err") {
         const msg = getApiErrorMessage(result.err);
-        console.log("[CourtEdge] Investigation error:", msg);
+        console.log("[EdgeStack] Investigation error:", msg);
         throw new Error(msg);
       }
       return result.ok;

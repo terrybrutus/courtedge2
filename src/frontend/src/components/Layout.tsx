@@ -34,10 +34,10 @@ export function Layout({ children, className }: LayoutProps) {
             </div>
             <div className="flex flex-col">
               <span className="font-display text-base font-bold text-foreground tracking-tight leading-none">
-                Court<span className="text-primary">Edge</span>
+                Edge<span className="text-primary">Stack</span>
               </span>
               <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-muted-foreground leading-none mt-0.5">
-                NBA Betting Intel
+                Sports Intelligence
               </span>
             </div>
           </Link>
@@ -46,7 +46,7 @@ export function Layout({ children, className }: LayoutProps) {
           <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-md bg-muted/60 border border-border/40">
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
             <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-              Playoffs Live
+              Live Analysis
             </span>
           </div>
 
@@ -122,7 +122,7 @@ export function Layout({ children, className }: LayoutProps) {
       <footer className="bg-card border-t border-border/40 mt-auto">
         <div className="max-w-screen-2xl mx-auto px-4 py-3 flex items-center justify-between">
           <span className="text-[11px] font-mono text-muted-foreground">
-            © {new Date().getFullYear()} CourtEdge. For research purposes only.
+            © {new Date().getFullYear()} EdgeStack. For research purposes only.
           </span>
           <a
             href={`https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(typeof window !== "undefined" ? window.location.hostname : "")}`}

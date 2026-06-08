@@ -7,7 +7,7 @@ import GamesLib "../lib/games";
 import CacheLib "../lib/cache";
 import Float "mo:core/Float";
 
-mixin (bdlApiKey : Text, openAIApiKey : Text, httpTransform : shared query OutCall.TransformationInput -> async OutCall.TransformationOutput, cache : CacheLib.Cache) {
+mixin (bdlApiKey : Text, claudeApiKey : Text, httpTransform : shared query OutCall.TransformationInput -> async OutCall.TransformationOutput, cache : CacheLib.Cache) {
   // Fetch player props analysis for a game using Ball Don't Lie for real stats.
   // Roster is obtained from BDL (single game → team IDs → team rosters)
   // instead of ESPN, since ESPN event IDs differ from BDL game IDs.
@@ -133,37 +133,37 @@ mixin (bdlApiKey : Text, openAIApiKey : Text, httpTransform : shared query OutCa
     };
   };
 
-  // On-demand AI analysis — reads history context for self-learning
+  // On-demand AI analysis — only called when user clicks "Analyze with AI"
   public func getPropsAIAnalysis(gameId : Text, playerData : Text) : async Text {
-    let historyCtx = "";
-    let aiSystemPrompt = "You are CourtEdge AI, a professional NBA betting analyst. Be selective — only flag confidence ≥65 where multiple signals align. Less is more.";
+    let aiSystemPrompt = "You are EdgeStack AI, a professional sports betting analyst. Be selective — only flag confidence ≥65 where multiple signals align. Less is more.";
     let cleanData = playerData.replace(#text "\"", "'");
-    let cleanHistory = historyCtx.replace(#text "\"", "'");
-    let historyPart = if (cleanHistory != "") "Your past track record:\\n" # cleanHistory # "\\n\\n" else "";
-    let aiBody = "{\"model\":\"gpt-4o-mini\",\"messages\":[{\"role\":\"system\",\"content\":\"" # aiSystemPrompt # "\"},{\"role\":\"user\",\"content\":\"" # historyPart # "Analyze props for game " # gameId # ":\\n" # cleanData # "\\n\\nFor each player: confidence 0-100, plain reasoning. Focus on multiple signal convergence. Return well-structured text.\"}],\"max_tokens\":900,\"temperature\":0.3}";
+    let userContent = "Analyze props for game " # gameId # ":\\n" # cleanData # "\\n\\nFor each player: confidence 0-100, plain reasoning. Focus on multiple signal convergence. Return well-structured text.";
+    let aiBody = "{\"model\":\"claude-haiku-4-5-20251001\",\"max_tokens\":900,\"system\":\"" # aiSystemPrompt # "\",\"messages\":[{\"role\":\"user\",\"content\":\"" # userContent # "\"}]}";
     let aiHeaders = [
-      { name = "Authorization"; value = "Bearer " # openAIApiKey },
+      { name = "x-api-key"; value = claudeApiKey },
+      { name = "anthropic-version"; value = "2023-06-01" },
       { name = "Content-Type"; value = "application/json" },
     ];
     try {
-      let raw = await OutCall.httpPostRequest("https://api.openai.com/v1/chat/completions", aiHeaders, aiBody, httpTransform);
-      extractOpenAIContent(raw);
+      let raw = await OutCall.httpPostRequest("https://api.anthropic.com/v1/messages", aiHeaders, aiBody, httpTransform);
+      extractClaudeContentProps(raw);
     } catch (e) {
       "AI analysis unavailable: " # e.message();
     };
   };
 
-  private func extractOpenAIContent(raw : Text) : Text {
+  private func extractClaudeContentProps(raw : Text) : Text {
     if (GamesLib.textContains(raw, "\"error\":{") or GamesLib.textContains(raw, "\"error\": {")) {
       let errMsg = GamesLib.extractQuotedAfterKey(raw, "\"message\":");
-      return if (errMsg != "") "AI error: " # errMsg else "AI request failed — check your OpenAI key";
+      return if (errMsg != "") "AI error: " # errMsg else "AI request failed — check API key";
     };
-    let marker = "\"content\":\"";
+    // Claude response: {"content":[{"type":"text","text":"..."}],...}
+    let marker = "\"text\":\"";
     var last = raw;
     for (segment in raw.split(#text marker)) {
       last := segment;
     };
-    if (last == raw) return "No AI response found — the model may be overloaded, try again";
+    if (last == raw) return "No AI response found — try again";
     // Parse content, handling escape sequences
     let chars = last.toArray();
     var result = "";
