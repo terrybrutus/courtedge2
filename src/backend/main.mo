@@ -14,6 +14,8 @@ actor {
   let ODDS_API_KEY : Text = "6f6725d8b12b239c51bd1b404fd83c5e";
   let CLAUDE_API_KEY : Text = "sk-ant-api03-Gl3Sm6YSSPJLULNCimU__x8de8pCSoJxLCgHBMi3Ii_SjYf4qdK7WRZ" #
     "-OR-i2LFElg_ol1xkOjTvKHTMRXrj-A-ohK0IQAA";
+  // Retained for stable variable compatibility — was the old OpenAI key slot.
+  let OPENAI_API_KEY : Text = "";
 
   // Shared response cache — 15-minute TTL, persists across upgrades.
   let apiCache : CacheLib.Cache = CacheLib.empty();
