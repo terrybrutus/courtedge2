@@ -500,7 +500,7 @@ export default function HistoryPage() {
         <div className="flex items-center gap-2 mb-1.5">
           <BookOpen className="w-3.5 h-3.5 text-primary" />
           <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-primary font-semibold">
-            CourtEdge
+            EdgeStack
           </span>
         </div>
         <h1 className="font-display text-2xl font-bold text-foreground tracking-tight">

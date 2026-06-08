@@ -603,7 +603,7 @@ function PlayerPropsTab({
             className="text-xs font-mono text-destructive"
             data-ocid="investigation.props.ai_error_state"
           >
-            AI analysis failed — check your OpenAI key in Settings
+            AI analysis failed — contact support if this persists
           </p>
         )}
       </div>
@@ -1028,7 +1028,7 @@ function GameTotalTab({
             className="text-xs font-mono text-destructive"
             data-ocid="investigation.total.ai_error_state"
           >
-            AI analysis failed — check your OpenAI key in Settings
+            AI analysis failed — contact support if this persists
           </p>
         )}
       </div>
@@ -1526,7 +1526,7 @@ export default function InvestigationPage() {
             gameId: {gameId}
           </p>
           <p className="text-[11px] font-mono text-muted-foreground/50">
-            Check DevTools → Console for [CourtEdge] logs
+            Check DevTools → Console for [EdgeStack] logs
           </p>
         </div>
         <div className="flex gap-3">

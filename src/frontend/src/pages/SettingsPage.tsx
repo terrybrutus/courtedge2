@@ -18,7 +18,7 @@ export default function SettingsPage() {
       ocid: "settings.odds_status",
     },
     {
-      name: "OpenAI API",
+      name: "Claude AI",
       description:
         "AI-generated plain-language analysis and confidence reasoning",
       icon: "🤖",
@@ -86,8 +86,8 @@ export default function SettingsPage() {
         className="mt-6 px-4 py-3 rounded-lg border border-border/30 bg-muted/20"
       >
         <p className="text-[11px] font-mono text-muted-foreground/80">
-          All API keys are pre-configured. CourtEdge is ready to analyze any
-          playoff matchup.
+          All API keys are pre-configured. EdgeStack is ready to analyze any
+          matchup.
         </p>
       </motion.div>
     </div>

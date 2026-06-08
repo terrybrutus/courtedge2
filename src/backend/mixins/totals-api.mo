@@ -7,7 +7,7 @@ import CacheLib "../lib/cache";
 import Text "mo:core/Text";
 import Nat "mo:core/Nat";
 
-mixin (bdlApiKey : Text, openAIApiKey : Text, httpTransform : shared query OutCall.TransformationInput -> async OutCall.TransformationOutput, cache : CacheLib.Cache) {
+mixin (bdlApiKey : Text, claudeApiKey : Text, httpTransform : shared query OutCall.TransformationInput -> async OutCall.TransformationOutput, cache : CacheLib.Cache) {
   // Fetch game totals analysis using Ball Don't Lie for real team scoring data.
   public func getGameTotalsAnalysis(gameId : CommonTypes.GameId, homeTeamName : Text, awayTeamName : Text) : async CommonTypes.Result<TotalTypes.GameTotal> {
     let bdlAuthHeaders = [{ name = "Authorization"; value = "Bearer " # bdlApiKey }];
@@ -145,31 +145,30 @@ mixin (bdlApiKey : Text, openAIApiKey : Text, httpTransform : shared query OutCa
 
   // On-demand AI analysis for game totals — only called when user clicks "Analyze with AI".
   public func getTotalsAIAnalysis(gameId : Text, totalsData : Text) : async Text {
-    let historyCtx = "";
-    let aiSystemPrompt = "You are CourtEdge AI, a professional NBA betting analyst. Focus on game totals (over/under). Be selective — only recommend when multiple signals align.";
+    let aiSystemPrompt = "You are EdgeStack AI, a professional sports betting analyst. Focus on game totals (over/under). Be selective — only recommend when multiple signals align.";
     let sanitized = totalsData.replace(#text "\"", "'");
-    let cleanHistory = historyCtx.replace(#text "\"", "'");
-    let historyPart = if (cleanHistory != "") "Past totals track record:\\n" # cleanHistory # "\\n\\n" else "";
-    let aiBody = "{\"model\":\"gpt-4o-mini\",\"messages\":[{\"role\":\"system\",\"content\":\"" # aiSystemPrompt # "\"},{\"role\":\"user\",\"content\":\"" # historyPart # "Analyze this game total for game " # gameId # ":\\n" # sanitized # "\\n\\nGive: confidence (0-100), OVER/UNDER/PASS recommendation, projected total, and plain-language reasoning explaining the key signals.\"}],\"max_tokens\":600,\"temperature\":0.3}";
+    let userContent = "Analyze this game total for game " # gameId # ":\\n" # sanitized # "\\n\\nGive: confidence (0-100), OVER/UNDER/PASS recommendation, projected total, and plain-language reasoning explaining the key signals.";
+    let aiBody = "{\"model\":\"claude-haiku-4-5-20251001\",\"max_tokens\":600,\"system\":\"" # aiSystemPrompt # "\",\"messages\":[{\"role\":\"user\",\"content\":\"" # userContent # "\"}]}";
     let aiHeaders = [
-      { name = "Authorization"; value = "Bearer " # openAIApiKey },
+      { name = "x-api-key"; value = claudeApiKey },
+      { name = "anthropic-version"; value = "2023-06-01" },
       { name = "Content-Type"; value = "application/json" },
     ];
     try {
-      let raw = await OutCall.httpPostRequest("https://api.openai.com/v1/chat/completions", aiHeaders, aiBody, httpTransform);
-      // Extract assistant message content from OpenAI response JSON.
-      extractOpenAIContentTotals(raw);
+      let raw = await OutCall.httpPostRequest("https://api.anthropic.com/v1/messages", aiHeaders, aiBody, httpTransform);
+      extractClaudeContent(raw);
     } catch (e) {
       "AI analysis failed: " # e.message();
     };
   };
 
-  private func extractOpenAIContentTotals(raw : Text) : Text {
+  private func extractClaudeContent(raw : Text) : Text {
     if (GamesLib.textContains(raw, "\"error\":{") or GamesLib.textContains(raw, "\"error\": {")) {
       let errMsg = GamesLib.extractQuotedAfterKey(raw, "\"message\":");
-      return if (errMsg != "") "AI error: " # errMsg else "AI request failed — check your OpenAI key";
+      return if (errMsg != "") "AI error: " # errMsg else "AI request failed — check API key";
     };
-    let marker = "\"content\":\"";
+    // Claude response: {"content":[{"type":"text","text":"..."}],...}
+    let marker = "\"text\":\"";
     var last = raw;
     for (segment in raw.split(#text marker)) {
       last := segment;
