@@ -96,7 +96,6 @@ function GameCard({
   game,
   index,
   gamesDate,
-  isUpcoming,
 }: { game: Game; index: number; gamesDate: string; isUpcoming: boolean }) {
   const statusConfig = getStatusConfig(game.status);
   const statusStr = (game.status as unknown as string) ?? "";
@@ -111,6 +110,11 @@ function GameCard({
   const gameTime = isIsoDisplay
     ? formatIsoToEtDisplay(rawDisplay)
     : rawDisplay || "TBD";
+
+  // Compare game date to user's local date — don't rely on backend UTC isUpcoming flag.
+  // A game is "not today" if gamesDate differs from the user's local calendar date.
+  const localTodayStr = new Date().toLocaleDateString("en-CA"); // "YYYY-MM-DD" in local tz
+  const showDatePrefix = !isFinal && !isLive && gamesDate && gamesDate !== localTodayStr;
 
   return (
     <motion.div
@@ -168,7 +172,7 @@ function GameCard({
                   <>
                     <Clock className="w-3 h-3 text-muted-foreground/60" />
                     <span className="text-[11px] font-mono font-semibold text-foreground/80">
-                      {isUpcoming
+                      {showDatePrefix
                         ? `${new Date(`${gamesDate}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric" })} · ${gameTime}`
                         : gameTime}
                     </span>
@@ -345,7 +349,10 @@ export default function GamesPage() {
     });
   };
 
-  const pageTitle = isUpcomingDate ? "Upcoming Games" : "Today's Games";
+  // Use local date (not backend UTC) to decide if the games slate is "today" or "upcoming"
+  const localTodayStr = new Date().toLocaleDateString("en-CA");
+  const isLocallyUpcoming = gamesDate !== "" && gamesDate !== localTodayStr;
+  const pageTitle = isLocallyUpcoming ? "Upcoming Games" : "Today's Games";
 
   const todayLabel = new Date().toLocaleDateString("en-US", {
     weekday: "long",
@@ -396,7 +403,7 @@ export default function GamesPage() {
               {pageTitle}
             </h1>
             <p className="text-sm font-body text-muted-foreground mt-0.5">
-              {isUpcomingDate
+              {isLocallyUpcoming
                 ? `Next slate: ${formatGamesDate(gamesDate)}`
                 : "Select a game to open the investigation room"}
             </p>
@@ -428,7 +435,7 @@ export default function GamesPage() {
         {devDebug}
 
         {/* Upcoming date banner */}
-        {isUpcomingDate && gamesDate && !isLoading && !isError && (
+        {isLocallyUpcoming && gamesDate && !isLoading && !isError && (
           <motion.div
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
@@ -548,7 +555,7 @@ export default function GamesPage() {
               game={game}
               index={i}
               gamesDate={gamesDate}
-              isUpcoming={isUpcomingDate}
+              isUpcoming={isLocallyUpcoming}
             />
           ))}
         </div>
